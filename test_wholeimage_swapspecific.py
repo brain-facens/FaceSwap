@@ -83,7 +83,6 @@ if __name__ == '__main__':
     latend_id = model.netArc(img_id_downsample)
     latend_id = F.normalize(latend_id, p=2, dim=1)
 
-
     # The specific person to be swapped
     specific_person_whole = cv2.imread(pic_specific)
     specific_person_align_crop, _ = app.get(specific_person_whole,crop_size)
@@ -133,7 +132,7 @@ if __name__ == '__main__':
         net.load_state_dict(torch.load(save_pth))
         net.eval()
     else:
-        net =None
+        net = None
 
     if min_value < opt.id_thres:
 
