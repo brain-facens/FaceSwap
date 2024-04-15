@@ -1,0 +1,10 @@
+FROM python:3.10
+WORKDIR /home
+COPY lib/requirements.txt lib_requirements.txt
+COPY app/requirements.txt api_requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r lib_requirements.txt && \
+    pip install -r api_requirements.txt
+COPY app app
+COPY lib lib
+CMD [ "uvicorn", "app.main:app", "--port", "8000", "--host", "0.0.0.0" ]

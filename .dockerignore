@@ -1,0 +1,20 @@
+# Python stuffs
+__pycache__/
+
+# Envs
+poetry.lock
+env/
+venv/
+.env/
+.venv/
+
+# Logs
+*.log
+
+# git
+.git
+.git/
+.gitignore
+
+# docs
+*.md
