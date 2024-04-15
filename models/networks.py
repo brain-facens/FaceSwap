@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
 import functools
-from torch.autograd import Variable
 import numpy as np
-from torchvision import transforms
 import torch.nn.functional as F
 
 ###############################################################################
@@ -101,8 +99,8 @@ def print_network(net):
     num_params = 0
     for param in net.parameters():
         num_params += param.numel()
-    print(net)
-    print('Total number of parameters: %d' % num_params)
+    # print(net)
+    # print('Total number of parameters: %d' % num_params)
 
 ##############################################################################
 # Losses

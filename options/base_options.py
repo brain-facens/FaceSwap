@@ -1,7 +1,10 @@
 import argparse
 import os
-from util import util
+
 import torch
+
+from util import util
+
 
 class BaseOptions():
     def __init__(self):
@@ -83,22 +86,22 @@ class BaseOptions():
         if len(self.opt.gpu_ids) > 0:
             torch.cuda.set_device(self.opt.gpu_ids[0])
 
-        args = vars(self.opt)
+        # args = vars(self.opt)
 
-        print('------------ Options -------------')
-        for k, v in sorted(args.items()):
-            print('%s: %s' % (str(k), str(v)))
-        print('-------------- End ----------------')
+        # print('------------ Options -------------')
+        # for k, v in sorted(args.items()):
+        #     print('%s: %s' % (str(k), str(v)))
+        # print('-------------- End ----------------')
 
-        # save to the disk
-        if self.opt.isTrain:
-            expr_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
-            util.mkdirs(expr_dir)
-            if save and not self.opt.continue_train:
-                file_name = os.path.join(expr_dir, 'opt.txt')
-                with open(file_name, 'wt') as opt_file:
-                    opt_file.write('------------ Options -------------\n')
-                    for k, v in sorted(args.items()):
-                        opt_file.write('%s: %s\n' % (str(k), str(v)))
-                    opt_file.write('-------------- End ----------------\n')
+        # # save to the disk
+        # if self.opt.isTrain:
+        #     expr_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
+        #     util.mkdirs(expr_dir)
+        #     if save and not self.opt.continue_train:
+        #         file_name = os.path.join(expr_dir, 'opt.txt')
+        #         with open(file_name, 'wt') as opt_file:
+        #             opt_file.write('------------ Options -------------\n')
+        #             for k, v in sorted(args.items()):
+        #                 opt_file.write('%s: %s\n' % (str(k), str(v)))
+        #             opt_file.write('-------------- End ----------------\n')
         return self.opt
