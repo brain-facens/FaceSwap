@@ -9,9 +9,11 @@ abs_filepath = os.path.dirname(p=os.path.abspath(path=__file__))
 abs_filepath = abs_filepath.split(sep=os.sep)[:-1]
 abs_filepath = os.path.join(os.sep, *abs_filepath)
 sys.path.append(abs_filepath)
+sys.path.append(os.path.join(abs_filepath, "lib"))
 
 # === API ===
-from fastapi import BackgroundTasks, FastAPI, UploadFile, status, Depends, HTTPException
+from fastapi import (BackgroundTasks, Depends, FastAPI, HTTPException,
+                     UploadFile, status)
 from fastapi.responses import FileResponse
 
 # =====================================
@@ -20,10 +22,9 @@ from fastapi.responses import FileResponse
 # -------------------------------------
 from app.faceswap import FaceSwap
 from app.logger import logger
-from app.schemas import SimSwapInfo, AvailableFaces
+from app.schemas import AvailableFaces, SimSwapInfo
 
 try:
-    from app.faceswap import FaceSwap
     model = FaceSwap()
 except:
     FaceSwap.available = False

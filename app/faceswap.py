@@ -20,7 +20,7 @@ try:
     from torch.nn import functional as F
     from torchvision import transforms
 
-    from models.fs_model import fsModel
+    from lib.models.fs_model import fsModel
 except ImportError as error:
     logger.critical(msg=f"could not import some dependecy : {error}")
 except Exception as error:
@@ -48,7 +48,7 @@ class FaceSwap:
         """Return all available swaps."""
         logger.debug(msg="calling `FaceSwap.get_available_swaps` classmethod.")
         return cls.available_names
-    
+
     @classmethod
     async def get_image(cls, name: str, image_id: int) -> Path:
         """Return one especific image of one person."""
@@ -71,10 +71,10 @@ class FaceSwap:
             use_mask = True,
             output_path = os.path.join(abs_filepath, "results"),
             gpu_ids = "0",
-            checkpoints_dir = "./checkpoints",
+            checkpoints_dir = "./lib/checkpoints",
             name = "people",
             resize_or_crop = "scale_width",
-            Arc_path = "arcface_model/arcface_checkpoint.tar",
+            Arc_path = "./lib/arcface_model/arcface_checkpoint.tar",
             which_epoch = "latest",
             verbose = False,
             fp16 = False,
