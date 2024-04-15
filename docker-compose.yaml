@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: "brain20/face_swap:api-v1.0"
+    ports:
+      - "8000:8000"
+    networks:
+      - local_net
+
+networks:
+  local_net:

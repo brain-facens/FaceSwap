@@ -8,11 +8,13 @@ venv/
 .env/
 .venv/
 
-# checkpoints
-*.zip
-*.tar
-*.onnx
-*.pth
-
 # Logs
 *.log
+
+# git
+.git
+.git/
+.gitignore
+
+# docs
+*.md

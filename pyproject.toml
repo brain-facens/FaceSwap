@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "simswap"
+version = "0.1.0"
+description = ""
+authors = ["Matheus Oliveira de Souza <msouza.os@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.lib.dependencies]
+torch = "^2.2.2"
+torchvision = "^0.17.2"
+opencv-python = "^4.9.0.80"
+pillow = "^10.3.0"
+numpy = "^1.26.4"
+imageio = "^2.34.0"
+moviepy = "^1.0.3"
+insightface = "^0.7.3"
+timm = "0.5.4"
+
+
+[tool.poetry.group.api.dependencies]
+fastapi = "^0.110.1"
+uvicorn = "^0.29.0"
+python-multipart = "^0.0.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
