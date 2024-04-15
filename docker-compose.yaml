@@ -1,9 +1,10 @@
 services:
   api:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: "brain20/face_swap:api-v1.0"
+    container_name: "face_swap"
     ports:
       - "8000:8000"
     networks:
