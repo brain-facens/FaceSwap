@@ -9,6 +9,16 @@ services:
       - "8000:8000"
     networks:
       - local_net
+  demo:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.demo
+    container_name: "face_swap_demo"
+    ports:
+      - "8501:8501"
+    networks:
+      - local_net
 
 networks:
   local_net:

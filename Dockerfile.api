@@ -3,7 +3,9 @@ RUN apt update -y && apt install -y python3 \
                                     python3-pip \
                                     ffmpeg \
                                     libsm6 \
-                                    libxext6
+                                    libxext6 \
+                                    && \
+                                    rm -rf /var/lib/apt/lists/*
 WORKDIR /home
 COPY lib/requirements.txt lib_requirements.txt
 COPY app/requirements.txt api_requirements.txt

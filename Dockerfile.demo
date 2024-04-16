@@ -1,0 +1,12 @@
+FROM --platform=linux/amd64 ubuntu:22.04
+RUN apt update -y && apt install -y python3 \
+                                    python3-pip \
+                                    && \
+                                    rm -rf /var/lib/apt/lists/*
+WORKDIR /home
+COPY demo/requirements.txt requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+COPY demo demo
+RUN chmod +x demo/run.sh
+CMD [ "./demo/run.sh" ]
