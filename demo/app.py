@@ -11,6 +11,11 @@ import httpx
 import streamlit as st
 from PIL import Image
 
+SERVER_OPTIONS = {
+    "local",
+    "container"
+}
+
 
 async def get_request(url: str, is_image: bool = False):
     async with httpx.AsyncClient() as client:
@@ -26,7 +31,8 @@ async def get_request(url: str, is_image: bool = False):
 
 
 with open(file=os.path.join(abs_filepath, "demo", "config.json"), mode="r") as json_buffer:
-    config = json.load(fp=json_buffer)
+    server = os.getenv(key="FACE_SWAP_SERVER") if os.getenv(key="FACE_SWAP_SERVER") in SERVER_OPTIONS else "local"
+    config = json.load(fp=json_buffer).get(server)
     URL = config.get("protocol") + "://" + config.get("IP")
     if config.get("port"):
         URL = URL + ":" + config.get("port")

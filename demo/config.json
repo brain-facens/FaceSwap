@@ -1,5 +1,12 @@
 {
-    "protocol": "http",
-    "IP": "api",
-    "port": ""
+    "local": {
+        "protocol": "http",
+        "IP": "0.0.0.0",
+        "port": "8000"
+    },
+    "container": {
+        "protocol": "http",
+        "IP": "api",
+        "port": ""
+    }
 }
