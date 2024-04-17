@@ -9,4 +9,4 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 COPY demo demo
 RUN chmod +x demo/run.sh
-CMD [ "./demo/run.sh" ]
+CMD [ "demo/run.sh" ]

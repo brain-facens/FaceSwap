@@ -7,6 +7,6 @@
     "container": {
         "protocol": "http",
         "IP": "api",
-        "port": ""
+        "port": "8000"
     }
 }

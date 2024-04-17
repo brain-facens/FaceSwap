@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: "face_swap"
+    container_name: face_swap
     ports:
       - "8000:8000"
     networks:
@@ -14,11 +14,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.demo
-    container_name: "face_swap_demo"
+    container_name: face_swap_demo
     ports:
       - "8501:8501"
     networks:
       - local_net
+    environment:
+      FACE_SWAP_SERVER: container
 
 networks:
   local_net:
