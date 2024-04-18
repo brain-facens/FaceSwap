@@ -2,20 +2,28 @@ import asyncio
 import io
 import json
 import os
+import sys
+import time
 
-abs_filepath = os.path.dirname(p=os.path.abspath(path=__file__))
+# absolute path to this folder
+abs_filepath = os.path.abspath(path=os.path.dirname(p=__file__))
 abs_filepath = abs_filepath.split(sep=os.sep)[:-1]
 abs_filepath = os.path.join(os.sep, *abs_filepath)
+sys.path.append(abs_filepath)
+sys.path.append(os.path.join(abs_filepath, "demo"))
 
+import cv2
 import httpx
+import numpy as np
 import streamlit as st
 from PIL import Image
+
+from demo.video import VideoCapture
 
 SERVER_OPTIONS = {
     "local",
     "container"
 }
-
 
 async def get_request(url: str, is_image: bool = False):
     async with httpx.AsyncClient() as client:
@@ -30,6 +38,17 @@ async def get_request(url: str, is_image: bool = False):
     return None
 
 
+async def post_request(url: str, image: Image.Image):
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url=url, files={"image": image})
+        except httpx.ConnectError:
+            return None
+        if response.status_code == 201:
+            return response.read()
+    return None
+
+
 with open(file=os.path.join(abs_filepath, "demo", "config.json"), mode="r") as json_buffer:
     server = os.getenv(key="FACE_SWAP_SERVER") if os.getenv(key="FACE_SWAP_SERVER") in SERVER_OPTIONS else "local"
     config = json.load(fp=json_buffer).get(server)
@@ -38,7 +57,6 @@ with open(file=os.path.join(abs_filepath, "demo", "config.json"), mode="r") as j
         URL = URL + ":" + config.get("port")
 
 if __name__=="__main__":
-
 
     # configs
     brain_col, liga_col = st.columns(spec=2)
@@ -100,6 +118,52 @@ if __name__=="__main__":
             st.image(image=pil_img)
 
     st.header(body="Camera", divider=True)
-    camera = st.camera_input(label="Camera", label_visibility="hidden")
-    if camera:
-        pass
+    cam_index = st.number_input(label="Porta USB da camera", min_value=0, max_value=5, step=1)
+    st.text(body="Enquadre seu rosto na região marcada na imagem até ela ficar verde.")
+    cap = cv2.VideoCapture(cam_index)
+    frame_placeholder = st.empty()
+    counter = 3
+    timer = 0
+    crop = None
+    while cap.isOpened():
+        check, raw_frame = cap.read()
+        if not check:
+            st.error(body="Nenhum vídeo capturado.")
+            st.stop()
+        else:
+            frame, ready, crop = VideoCapture.recv(frame=raw_frame)
+            if ready:
+                if not timer:
+                    timer = time.time()
+                else:
+                    if time.time() - timer >= 1:
+                        counter -= 1
+                        timer = time.time()
+                height, width, _ = frame.shape
+                cx, cy = width // 2, height // 2
+                frame = cv2.putText(img=frame, text=f"{counter}", org=(cx, cy), color=(0,255,0), fontFace=1, fontScale=3, thickness=2)
+                if counter == 0:
+                    break
+            else:
+                counter = 3
+                timer = 0
+            frame_placeholder.image(image=frame, channels="BGR")
+
+    if crop is not None:
+        crop = cv2.cvtColor(src=crop, code=cv2.COLOR_BGR2RGB)
+        crop = Image.open(fp=io.BytesIO(initial_bytes=crop.tobytes()), mode="rb")
+        with st.spinner(text="Gerando imagem.."):
+            response = asyncio.run(main=post_request(url=f"{URL}/inference/{face.get('name')}/{image_id}", image=crop))
+            if response is None:
+                st.error(body="Não foi possível gerar a imagem.")
+                st.stop()
+            with Image.open(io.BytesIO(initial_bytes=response)) as pil_img:
+                st.image(image=pil_img)
+    else:
+        st.error(body="Nenhuma camera foi detectada.")
+
+    if st.button(label="Reinicar"):
+        st.rerun()
+
+    cap.release()
+    cv2.destroyAllWindows()
