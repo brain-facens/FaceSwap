@@ -35,6 +35,11 @@ streamlit-webrtc = "^0.47.6"
 mediapipe = "^0.10.11"
 
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+matplotlib = "^3.8.4"
+
 [[tool.poetry.source]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"

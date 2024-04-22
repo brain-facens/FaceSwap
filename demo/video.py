@@ -1,20 +1,13 @@
 import os
 
-import av
 import cv2
 import mediapipe as mp
 import numpy as np
-import streamlit as st
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
-from streamlit_webrtc import (RTCConfiguration, VideoProcessorBase, WebRtcMode,
-                              webrtc_streamer)
 
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
 
-class VideoCapture(VideoProcessorBase):
+class VideoCapture:
 
     model_path = os.path.abspath(path=os.path.dirname(p=__file__))
     model_path = os.path.join(model_path, "models", "face_landmarker.task")

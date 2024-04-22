@@ -21,6 +21,7 @@ try:
     from torchvision import transforms
 
     from lib.models.fs_model import fsModel
+    from lib.utils import create_model
 except ImportError as error:
     logger.critical(msg=f"could not import some dependecy : {error}")
 except Exception as error:
