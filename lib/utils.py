@@ -1,3 +1,4 @@
+import math
 import os
 from argparse import Namespace
 
@@ -7,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from mediapipe.tasks.python.vision.face_landmarker import FaceLandmarkerResult
-from PIL import Image
+from PIL import Image, ImageDraw
 from torchvision.transforms import transforms
 
 from lib.models.fs_model import fsModel
@@ -31,6 +32,21 @@ def create_model(abs_filepath: str) -> fsModel:
     model.initialize(opt=opt)
     model.eval()
     return model
+
+class SquarePad:
+
+    def __call__(self, image: torch.Tensor, pad: int = None):
+        _, h, w = image.size()
+        if pad:
+            max_wh = pad
+        else:
+            max_wh = np.max([h, w])
+        hp = (max_wh - h) / 2
+        wp = (max_wh - w) / 2
+        hpf, hpc = math.floor(hp), math.ceil(hp)
+        wpf, wpc = math.floor(wp), math.ceil(wp)
+        padding = (wpc, wpf, hpc, hpf)
+        return F.pad(input=image, pad=padding, value=0, mode="constant")
 
 
 class FaceRecognitionModel:
@@ -114,15 +130,25 @@ class FaceSwapModel:
         self.transformer = transforms.Compose([
             transforms.ToTensor()
         ])
+        self.pad = SquarePad()
 
     @torch.no_grad
-    def __call__(self, src: Image.Image, tgt: Image.Image, face_box: tuple) -> Image.Image:
-        # crop_src = src.crop(box=face_box)
+    def __call__(self, src: Image.Image, tgt: Image.Image, src_box: tuple, tgt_box: tuple) -> Image.Image:
+        # crop face
+        face_mask = Image.new(mode="RGB", size=src.size, color="#000000")
+        draw = ImageDraw.Draw(im=face_mask)
+        draw.rectangle(xy=[(src_box[0], src_box[1]), (src_box[2], src_box[3])], fill="#FFFFFF")
+        crop_src = Image.composite(src, face_mask, face_mask.convert(mode="L"))
 
-        tgt_img = self.transformer_Arcface(tgt)
+        face_mask = Image.new(mode="RGB", size=tgt.size, color="#000000")
+        draw = ImageDraw.Draw(im=face_mask)
+        draw.rectangle(xy=[(tgt_box[0], tgt_box[1]), (tgt_box[2], tgt_box[3])], fill="#FFFFFF")
+        crop_tgt = Image.composite(tgt, face_mask, face_mask.convert(mode="L"))
+
+        tgt_img = self.transformer_Arcface(crop_tgt)
         img_id = tgt_img.view(-1, tgt_img.shape[0], tgt_img.shape[1], tgt_img.shape[2])
 
-        user_img = self.transformer(src)
+        user_img = self.transformer(crop_src)
         img_att = user_img.view(-1, user_img.shape[0], user_img.shape[1], user_img.shape[2])
 
         # create latent id
@@ -151,8 +177,15 @@ class FaceSwapModel:
         output = np.array(output)
         output = output[..., ::-1]
         output = output*255
+        output = cv2.cvtColor(src=output, code=cv2.COLOR_BGR2RGB)
+        output = output.astype(dtype=np.uint8)
 
-        pil_output = Image.fromarray(obj=output, mode="RGB")
-        # pil_output = pil_output.resize(size=src.size)
-        # pil_output = src.paste(im=pil_output, box=face_box)
-        return output
+        # remove padding
+        no_pad = Image.fromarray(obj=output, mode="RGB")
+        no_pad = no_pad.resize(size=src.size)
+        no_pad = no_pad.crop(box=src_box)
+
+        # pasting result
+        results = src.copy()
+        results.paste(im=no_pad, box=src_box)
+        return results
