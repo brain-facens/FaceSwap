@@ -115,6 +115,7 @@ class FaceSwapModel:
             transforms.ToTensor()
         ])
 
+    @torch.no_grad
     def __call__(self, src: Image.Image, tgt: Image.Image, face_box: tuple) -> Image.Image:
         # crop_src = src.crop(box=face_box)
 
